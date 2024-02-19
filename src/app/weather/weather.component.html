@@ -1,62 +1,142 @@
+<!-- Our main container -->
 <div class="container">
-    <div class="row">
-            <div class="col-md-12">
-                <h1 class="text-center">Search for Weather</h1>
-                <form [formGroup]="weatherSearch" (ngSubmit)="sendToAPI(weatherSearch.value)">
-                    <div class="form-group">
-                        <input 
-                            class="form-control"
-                            type="text"
-                            id="location"
-                            placeholder="Please Input a Location, (Example New York, NY | Orlando, FL | etc.)"
-                            formControlName="location"
-                            />
-                    </div>
-                    <div class="text-center">
-                        <button 
-                            type="submit"
-                            class="btn btn-success btn-md">
-                        Search for the Weather</button>
-                        <br>
-                        <!-- <button 
-                            class="btn btn-danger" 
-                            (click)="clearStoredWeatherData">
-                        Clear History</button> -->
-                    </div>
-                </form>
-                <hr>
-                <div>
-                    <h3 class="text-center">Weather Details</h3>
-                    <div class="thumbnail">
-                            <img 
-                            src="{{ this.weatherData?.current.weather_icons }}" 
-                            alt="{{ this.weatherData?.current.weather_descriptions }}">
-                        <div class="caption">
-                            <h3 class="text-center">Location Searched: <br>{{ this.weatherData?.location.name}}, {{ this.weatherData?.location.country}}.</h3>
-                            <p class="text-center">Current Weather Conditions: {{ this.weatherData?.current.weather_descriptions }}</p>
-                            <p class="text-center">Temperature in Degrees Farenheit: {{ this.weatherData?.current.temperature}} {{ this.weatherData?.request.unit}}</p>
-                            <p class="text-center">Feels Like in Degrees Farenheit {{ this.weatherData?.current.feelslike}} {{ this.weatherData?.request.unit}}</p>
-                            <p class="text-center">The Local Time is: {{ this.weatherData?.location.localtime}}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-        <hr>
-        <div class="text-center"></div>
-        <div class="row">
-        <div class="col-md-3 col-md-4" *ngFor="let weather of weatherHistory">
-            <div class="thumbnail">
-                    <img 
-                    src="{{ weather.current.weather_icons }}" 
-                    alt="{{ weather.current.weather_descriptions }}">
-                <div class="caption">
-                    <h3 class="text-center">Location: <br>{{ weather.location.name}}, {{ weather.location.country}}.</h3>
-                    <p class="text-center">Conditions: {{ weather.current.weather_descriptions }}</p>
-                    <p class="text-center">Temperature / Farenheit: {{ weather.current.temperature}} {{ weather.request.unit}}</p>
-                    <p class="text-center">Feels Like: {{ weather.current.feelslike}} {{ weather.request.unit}}</p>
-                    <p class="text-center">Local Time: {{ weather.location.localtime}}</p>
-                </div>
-            </div>
+  <div class="row">
+    <div class="col-md-12">
+      <h1 class="text-center">Search for Weather</h1>
+      <!-- Form for searching for a city's current weather -->
+      <form
+        [formGroup]="weatherSearch"
+        (ngSubmit)="sendToAPI(weatherSearch.value)"
+      >
+        <div class="form-group">
+          <input
+            class="form-control"
+            type="text"
+            id="location"
+            placeholder="Please Input a Location, (Example New York, NY | Orlando, FL | etc.)"
+            formControlName="location"
+          />
+        </div>
+        <div class="text-center">
+          <button type="submit" class="btn btn-success btn-md">
+            Search for the Weather
+          </button>
+        </div>
+      </form>
+      <hr />
     </div>
+    <!-- User inputs a location as well as chooses how many years go they'd like the maxTemp for -->
+    <div>
+      <form
+        [formGroup]="historicalWeatherSearch"
+        (ngSubmit)="getHistoricalTemperature(historicalWeatherSearch.value)
+        "
+      >
+        <div class="form-group">
+          <input
+            class="form-control"
+            type="text"
+            id="historicalLocation"
+            placeholder="Please Input a Location, (Example New York, NY | Orlando, FL | etc.)"
+            formControlName="historicalLocation"
+          />
+          <div class="form-group">
+         <!--<label for="historicalYearsAgo">Select Years Ago:</label>
+            <select
+              class="form-control"
+              id="historicalYearsAgo"
+              formControlName="historicalYearsAgo">
+              <option value="3">3 years ago</option>
+            </select> -->
+          </div>
+          <div class="form-group">
+            <label for="historicalDate">Select a Date:</label>
+            <input
+              class="form-control"
+              type="date"
+              id="historicalDate"
+              placeholder="Select a Date"
+              formControlName="historicalDate"
+            />
+          </div>
+        </div>
+        <div class="text-center">
+          <button type="submit" class="btn btn-success btn-md">
+            Search for Historical Temperature
+          </button>
+          <br />
+        </div>
+      </form>
+      <hr />
+      <!-- Direct results from main weather search  -->
+      <div>
+        <h3 class="text-center" *ngIf="weatherData">Weather Details</h3>
+        <div class="thumbnail" *ngIf="weatherData">
+          <img
+            src="{{ this.weatherData?.current.weather_icons }}"
+            alt="{{ this.weatherData?.current.weather_descriptions }}"
+          />
+          <div class="caption">
+            <h3 class="text-center">
+              Location Searched: <br />{{ this.weatherData?.location.name }},
+              {{ this.weatherData?.location.country }}.
+            </h3>
+            <p class="text-center">
+              Current Weather Conditions:
+              {{ this.weatherData?.current.weather_descriptions }}
+            </p>
+            <p class="text-center">
+              Temperature in Degrees Farenheit:
+              {{ this.weatherData?.current.temperature }}
+              {{ this.weatherData?.request.unit }}
+            </p>
+            <p class="text-center">
+              Feels Like in Degrees Farenheit
+              {{ this.weatherData?.current.feelslike }}
+              {{ this.weatherData?.request.unit }}
+            </p>
+            <p class="text-center">
+              The Local Time is: {{ this.weatherData?.location.localtime }}
+            </p>
+          </div>
+        </div>
+      </div>
+      <!-- NgFor Template that will pull from FireBase with previous results -->
+      <div class="list-group">
+        <div class="list-group-item" *ngFor="let weather of weatherHistory">
+          <a class="list-group-item-text">
+            {{ weather.location.localtime }}
+          </a>
+          <h4 class="list-group-item-heading">
+            {{ weather.location.name }}, {{ weather.location.country }}.
+          </h4>
+          <a class="list-group-item-text">
+            Conditions: {{ weather.current.weather_descriptions }}</a
+          >
+          <a class="list-group-item-text">
+            Temperature / Farenheit: {{ weather.current.temperature }}
+            {{ weather.request.unit }}</a
+          >
+          <a class="list-group-item-text"
+            >Feels Like: {{ weather.current.feelslike }}
+            {{ weather.request.unit }}</a>
+            <button class="pull-right" (click)="clearStoredWeatherData()">X</button>
+        </div>
+      </div>
+      <hr />
+     <!-- <div class="list-group" *ngIf="historicalWeather.length > 0">
+        <div class="list-group-item" *ngFor="let historical of historicalWeather;">
+          <h4 class="list-group-item-heading">{{ historical.date}}</h4>
+          <a class="list-group-item-text">Max Temp That Day: {{ historical.main.maxtemp}} °F</a>
+        </div>
+      </div> -->
+
+      <div class="list-group" *ngIf="historicalTemperatureData">
+        <div
+          class="list-group-item" *ngFor="let historicalTemp of historicalTemperatureData.historical | keyvalue">
+          <h4 class="list-group-item-heading">{{ historicalTemp.key }}</h4>
+          <a class="list-group-item-text"
+            >Max Temp That Day: {{ historicalTemp.value.maxtemp }} f°</a>
+        </div>
+      </div> 
 </div>

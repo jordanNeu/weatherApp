@@ -14,7 +14,7 @@ import { environment } from '../environments/environment';
 @NgModule({
   declarations: [
     AppComponent,
-    WeatherComponent
+    WeatherComponent,
   ],
   imports: [
     BrowserModule,
